@@ -61,6 +61,10 @@ impl From<f64> for Float {
 }
 
 impl Float {
+    pub fn new(inner: f64) -> Float {
+        Float(inner)
+    }
+
     pub fn abs(self) -> Float {
         Float(self.0.abs())
     }
@@ -72,6 +76,13 @@ impl Float {
     pub fn sqrt(self) -> Float {
         Float(self.0.sqrt())
     }
+}
+
+#[macro_export]
+macro_rules! float {
+    ($inner:expr) => {
+        $crate::tuples::Float::new($inner)
+    };
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -173,7 +184,7 @@ impl Tuple {
 #[macro_export]
 macro_rules! tuple {
     ($x:expr, $y: expr, $z: expr, $w: expr) => {
-        Tuple::new(Float($x), Float($y), Float($z), Float($w))
+        $crate::tuples::Tuple::new(float!($x), float!($y), float!($z), float!($w))
     };
 }
 #[macro_export]
@@ -191,22 +202,21 @@ macro_rules! vector {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     #[test]
     fn a_tuple_with_w_1_is_a_point() {
         let a = tuple!(4.3, -4.2, 3.1, 1.0);
-        assert_eq!(a.x, Float(4.3));
-        assert_eq!(a.y, Float(-4.2));
-        assert_eq!(a.z, Float(3.1));
+        assert_eq!(a.x, float!(4.3));
+        assert_eq!(a.y, float!(-4.2));
+        assert_eq!(a.z, float!(3.1));
         assert!(a.is_point());
         assert!(!a.is_vector());
     }
     #[test]
     fn a_tuple_with_w_0_is_a_vector() {
         let a = tuple!(4.3, -4.2, 3.1, 0.0);
-        assert_eq!(a.x, Float(4.3));
-        assert_eq!(a.y, Float(-4.2));
-        assert_eq!(a.z, Float(3.1));
+        assert_eq!(a.x, float!(4.3));
+        assert_eq!(a.y, float!(-4.2));
+        assert_eq!(a.z, float!(3.1));
         assert!(!a.is_point());
         assert!(a.is_vector());
     }
@@ -258,37 +268,37 @@ mod tests {
     #[test]
     fn multiplying_a_tuple_by_a_scalar() {
         let a = tuple!(1.0, -2.0, 3.0, -4.0);
-        assert_eq!(a * Float(3.5), tuple!(3.5, -7.0, 10.5, -14.0));
+        assert_eq!(a * float!(3.5), tuple!(3.5, -7.0, 10.5, -14.0));
     }
     #[test]
     fn multiplying_a_tuple_by_a_fraction() {
         let a = tuple!(1.0, -2.0, 3.0, -4.0);
-        assert_eq!(a * Float(0.5), tuple!(0.5, -1.0, 1.5, -2.0));
+        assert_eq!(a * float!(0.5), tuple!(0.5, -1.0, 1.5, -2.0));
     }
     #[test]
     fn computing_the_magnitude_of_vector_1_0_0() {
         let v = vector!(1.0, 0.0, 0.0);
-        assert_eq!(v.magnitude(), Float(1.0));
+        assert_eq!(v.magnitude(), float!(1.0));
     }
     #[test]
     fn computing_the_magnitude_of_vector_0_1_0() {
         let v = vector!(0.0, 1.0, 0.0);
-        assert_eq!(v.magnitude(), Float(1.0));
+        assert_eq!(v.magnitude(), float!(1.0));
     }
     #[test]
     fn computing_the_magnitude_of_vector_0_0_1() {
         let v = vector!(0.0, 0.0, 1.0);
-        assert_eq!(v.magnitude(), Float(1.0));
+        assert_eq!(v.magnitude(), float!(1.0));
     }
     #[test]
     fn computing_the_magnitude_of_vector_1_2_3() {
         let v = vector!(1.0, 2.0, 3.0);
-        assert_eq!(v.magnitude(), Float(14.0).sqrt());
+        assert_eq!(v.magnitude(), float!(14.0).sqrt());
     }
     #[test]
     fn computing_the_magnitude_of_vector_n1_n2_n3() {
         let v = vector!(-1.0, -2.0, -3.0);
-        assert_eq!(v.magnitude(), Float(14.0).sqrt());
+        assert_eq!(v.magnitude(), float!(14.0).sqrt());
     }
     #[test]
     fn normalizing_vector_4_0_0_gives_1_0_0() {
@@ -304,7 +314,7 @@ mod tests {
     fn the_dot_product_of_two_tuples() {
         let a = vector!(1.0, 2.0, 3.0);
         let b = vector!(2.0, 3.0, 4.0);
-        assert_eq!(a.dot(b), Float(20.0));
+        assert_eq!(a.dot(b), float!(20.0));
     }
     #[test]
     fn the_cross_product_of_two_vectors() {
